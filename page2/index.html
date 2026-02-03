@@ -26,8 +26,9 @@
 
         .button-container {
             display: flex;
-            gap: 30px;
-            position: relative;
+            gap: 50px;
+            align-items: center;
+            justify-content: center;
         }
 
         button {
@@ -44,6 +45,7 @@
             background-color: #4CAF50;
             color: white;
             transform: scale(1);
+            z-index: 10;
         }
 
         #helloBtn:hover {
@@ -53,8 +55,6 @@
         #noBtn {
             background-color: #f44336;
             color: white;
-            position: absolute;
-            right: 0;
         }
 
         .result-container {
@@ -89,7 +89,6 @@
 
     <div class="result-container" id="resultContainer">
         <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExd3JtOGI1emtsb3F1OG00Y3dqdWNmdWQyeG14azg3cGJ4M3lrbTltayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xT0Gqf71Oqz4ydP1ew/200.gif" alt="Happy image">
-        <p>How are you doing?</p>
     </div>
 
     <script>
@@ -99,22 +98,21 @@
         const resultContainer = document.getElementById('resultContainer');
 
         let currentScale = 1;
-        let growInterval;
-
-        // Start growing the Hello button
-        growInterval = setInterval(() => {
-            currentScale += 0.05;
-            helloBtn.style.transform = `scale(${currentScale})`;
-        }, 200);
 
         // Make the "Fuck off" button run away from the cursor
         noBtn.addEventListener('mouseenter', () => {
+            growHelloButton();
             moveButton();
         });
 
         noBtn.addEventListener('mousemove', () => {
             moveButton();
         });
+
+        function growHelloButton() {
+            currentScale += 0.1;
+            helloBtn.style.transform = `scale(${currentScale})`;
+        }
 
         function moveButton() {
             const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
@@ -127,7 +125,6 @@
 
         // Handle Hello button click
         helloBtn.addEventListener('click', () => {
-            clearInterval(growInterval);
             buttonContainer.style.display = 'none';
             resultContainer.style.display = 'flex';
         });
