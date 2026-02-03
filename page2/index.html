@@ -4,8 +4,133 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Page 2</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 72px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 50px;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 30px;
+            position: relative;
+        }
+
+        button {
+            padding: 20px 40px;
+            font-size: 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        #helloBtn {
+            background-color: #4CAF50;
+            color: white;
+            transform: scale(1);
+        }
+
+        #helloBtn:hover {
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+
+        #noBtn {
+            background-color: #f44336;
+            color: white;
+            position: absolute;
+            right: 0;
+        }
+
+        .result-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .result-container img {
+            max-width: 500px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .result-container p {
+            font-size: 36px;
+            color: white;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello World from Page 2</h1>
+    <h1>Hello Natashaa!</h1>
+
+    <div class="button-container" id="buttonContainer">
+        <button id="helloBtn">Hello</button>
+        <button id="noBtn">Fuck off</button>
+    </div>
+
+    <div class="result-container" id="resultContainer">
+        <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExd3JtOGI1emtsb3F1OG00Y3dqdWNmdWQyeG14azg3cGJ4M3lrbTltayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xT0Gqf71Oqz4ydP1ew/200.gif" alt="Happy image">
+        <p>How are you doing?</p>
+    </div>
+
+    <script>
+        const helloBtn = document.getElementById('helloBtn');
+        const noBtn = document.getElementById('noBtn');
+        const buttonContainer = document.getElementById('buttonContainer');
+        const resultContainer = document.getElementById('resultContainer');
+
+        let currentScale = 1;
+        let growInterval;
+
+        // Start growing the Hello button
+        growInterval = setInterval(() => {
+            currentScale += 0.05;
+            helloBtn.style.transform = `scale(${currentScale})`;
+        }, 200);
+
+        // Make the "Fuck off" button run away from the cursor
+        noBtn.addEventListener('mouseenter', () => {
+            moveButton();
+        });
+
+        noBtn.addEventListener('mousemove', () => {
+            moveButton();
+        });
+
+        function moveButton() {
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
+
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = x + 'px';
+            noBtn.style.top = y + 'px';
+        }
+
+        // Handle Hello button click
+        helloBtn.addEventListener('click', () => {
+            clearInterval(growInterval);
+            buttonContainer.style.display = 'none';
+            resultContainer.style.display = 'flex';
+        });
+    </script>
 </body>
 </html>
