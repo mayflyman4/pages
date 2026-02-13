@@ -4,8 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Main Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: clamp(32px, 8vw, 64px);
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .nav-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        a {
+            display: block;
+            padding: 20px;
+            background-color: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: clamp(18px, 4vw, 24px);
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        a:active {
+            transform: translateY(0);
+        }
+    </style>
 </head>
 <body>
     <h1>Welcome to GitHub Pages</h1>
+    <div class="nav-container">
+        <a href="page1/">Page 1</a>
+        <a href="page2/">Page 2</a>
+        <a href="page3/">Page 3</a>
+    </div>
 </body>
 </html>
