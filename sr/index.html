@@ -89,6 +89,61 @@
             object-fit: contain;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 5;
+        }
+
+        .sparkle {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: radial-gradient(circle, #fff, transparent);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: sparkle-float 3s ease-in-out infinite;
+            opacity: 0;
+        }
+
+        @keyframes sparkle-float {
+            0% {
+                opacity: 0;
+                transform: translateY(0) scale(0);
+            }
+            10% {
+                opacity: 1;
+                transform: translateY(-20px) scale(1);
+            }
+            50% {
+                opacity: 0.8;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100vh) scale(0.5);
+            }
+        }
+
+        .sparkle::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #fff, transparent);
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px #fff;
+        }
+
+        .sparkle::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 20px;
+            background: linear-gradient(180deg, transparent, #fff, transparent);
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px #fff;
         }
 
         @media (max-width: 768px) {
@@ -178,10 +233,39 @@
             noBtn.style.top = Math.max(10, y) + 'px';
         }
 
+        // Function to create sparkles
+        function createSparkle() {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+
+            // Random position
+            sparkle.style.left = Math.random() * window.innerWidth + 'px';
+            sparkle.style.top = window.innerHeight + 'px';
+
+            // Random animation delay and duration
+            sparkle.style.animationDelay = Math.random() * 2 + 's';
+            sparkle.style.animationDuration = (Math.random() * 2 + 3) + 's';
+
+            document.body.appendChild(sparkle);
+
+            // Remove sparkle after animation
+            setTimeout(() => {
+                sparkle.remove();
+            }, 6000);
+        }
+
         // Handle Hello button click
         helloBtn.addEventListener('click', () => {
             buttonContainer.style.display = 'none';
             resultContainer.style.display = 'flex';
+
+            // Create sparkles continuously
+            setInterval(createSparkle, 200);
+
+            // Create initial burst of sparkles
+            for (let i = 0; i < 20; i++) {
+                setTimeout(createSparkle, i * 100);
+            }
         });
     </script>
 </body>
