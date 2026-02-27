@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flwr</title>
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: clamp(36px, 10vw, 72px);
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: clamp(18px, 4vw, 24px);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            touch-action: manipulation;
+            min-width: 120px;
+        }
+
+        #helloBtn {
+            background-color: #4CAF50;
+            color: white;
+            transform: scale(1);
+            z-index: 10;
+            position: relative;
+        }
+
+        #helloBtn:hover {
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+
+        #noBtn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .result-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .result-container img {
+            max-width: 90%;
+            width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 5;
+        }
+
+        .sparkle {
+            position: fixed;
+            font-size: 24px;
+            pointer-events: none;
+            animation: sparkle-float 3s ease-in-out infinite;
+            opacity: 0;
+        }
+
+        .sparkle::before {
+            content: '❤️';
+        }
+
+        @keyframes sparkle-float {
+            0% {
+                opacity: 0;
+                transform: translateY(0) scale(0) rotate(0deg);
+            }
+            10% {
+                opacity: 1;
+                transform: translateY(-20px) scale(1) rotate(10deg);
+            }
+            50% {
+                opacity: 0.9;
+                transform: translateY(-50vh) scale(1.2) rotate(-10deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100vh) scale(0.8) rotate(20deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                margin-bottom: 20px;
+            }
+
+            .button-container {
+                gap: 15px;
+                flex-direction: column;
+            }
+
+            button {
+                width: 80%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Srajjuuuuuuuu! Sooorrrrryyyyyy!!!</h1>
+
+    <div class="button-container" id="buttonContainer">
+        <button id="helloBtn">I Still love you!!</button>
+        <button id="noBtn">I hate you! Go awayyyyyyy!</button>
+    </div>
+
+    <div class="result-container" id="resultContainer">
+        <img src="image.png" alt="Happy image">
+    </div>
+
+    <script>
+        /*
+         * Variables used in this script:
+         * - helloBtn: Reference to the "Hello" button element
+         * - noBtn: Reference to the "Fuck off" button element
+         * - buttonContainer: Reference to the container div holding both buttons
+         * - resultContainer: Reference to the div that shows the result (gif image)
+         * - currentScale: Tracks the current scale/size of the Hello button (starts at 1)
+         * - x: Random x-coordinate for repositioning the "Fuck off" button (local to moveButton function)
+         * - y: Random y-coordinate for repositioning the "Fuck off" button (local to moveButton function)
+         */
+
+        const helloBtn = document.getElementById('helloBtn');
+        const noBtn = document.getElementById('noBtn');
+        const buttonContainer = document.getElementById('buttonContainer');
+        const resultContainer = document.getElementById('resultContainer');
+
+        let currentScale = 1;
+
+        // Make the "I hate you Bharath" button run away from the cursor (desktop)
+        noBtn.addEventListener('mouseenter', () => {
+            growHelloButton();
+            moveButton();
+        });
+
+        noBtn.addEventListener('mousemove', () => {
+            moveButton();
+        });
+
+        // Touch support for mobile - prevent default tap behavior and move button
+        noBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            growHelloButton();
+            moveButton();
+        }, { passive: false });
+
+        function growHelloButton() {
+            currentScale += 0.1;
+            helloBtn.style.transform = `scale(${currentScale})`;
+        }
+
+        function moveButton() {
+            // Calculate safe boundaries
+            const maxX = window.innerWidth - noBtn.offsetWidth - 20;
+            const maxY = window.innerHeight - noBtn.offsetHeight - 20;
+
+            const x = Math.random() * Math.max(0, maxX);
+            const y = Math.random() * Math.max(0, maxY);
+
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = Math.max(10, x) + 'px';
+            noBtn.style.top = Math.max(10, y) + 'px';
+        }
+
+        // Function to create sparkles
+        function createSparkle() {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+
+            // Random position
+            sparkle.style.left = Math.random() * window.innerWidth + 'px';
+            sparkle.style.top = window.innerHeight + 'px';
+
+            // Random animation delay and duration
+            sparkle.style.animationDelay = Math.random() * 2 + 's';
+            sparkle.style.animationDuration = (Math.random() * 2 + 3) + 's';
+
+            document.body.appendChild(sparkle);
+
+            // Remove sparkle after animation
+            setTimeout(() => {
+                sparkle.remove();
+            }, 6000);
+        }
+
+        // Handle Hello button click
+        helloBtn.addEventListener('click', () => {
+            buttonContainer.style.display = 'none';
+            resultContainer.style.display = 'flex';
+
+            // Create sparkles continuously
+            setInterval(createSparkle, 200);
+
+            // Create initial burst of sparkles
+            for (let i = 0; i < 20; i++) {
+                setTimeout(createSparkle, i * 100);
+            }
+        });
+    </script>
+</body>
+</html>
