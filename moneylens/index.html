@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Statement Stats</title>
+    <title>Money Lens — see where your money went</title>
     <style>
         * {
             box-sizing: border-box;
@@ -24,8 +24,17 @@
             font-size: clamp(28px, 6vw, 48px);
             color: white;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            margin: 12px 0 24px;
+            margin: 12px 0 8px;
             text-align: center;
+        }
+
+        .tagline {
+            color: rgba(255, 255, 255, 0.92);
+            font-size: clamp(14px, 2.5vw, 17px);
+            text-align: center;
+            max-width: 640px;
+            margin: 0 auto 28px;
+            line-height: 1.5;
         }
 
         .card {
@@ -476,7 +485,11 @@
     </style>
 </head>
 <body>
-    <h1>Statement Stats</h1>
+    <h1>Money Lens</h1>
+    <p class="tagline">
+        Drop in your bank statement CSV to see where your money went — spending and income broken down by category,
+        the time range it covers, and totals in and out. Re-categorize anything we missed and export the result.
+    </p>
 
     <section id="uploadScreen">
         <div id="uploadCard" class="card">
@@ -502,7 +515,7 @@
     </section>
 
     <script>
-        // Mirror of stmt/categories.csv. Used as fallback when the file can't be fetched
+        // Mirror of moneylens/categories.csv. Used as fallback when the file can't be fetched
         // (e.g. opened via file://). Keep in sync with categories.csv. Order matters:
         // first matching pattern wins, so put more specific patterns above generic ones.
         const DEFAULT_CATEGORIES = [
