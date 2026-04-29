@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xoxo</title>
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #2d1b3d 50%, #4a1942 100%);
+            overflow: hidden;
+            color: #fff;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .stage {
+            width: 100%;
+            max-width: 720px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .line {
+            font-size: clamp(24px, 5vw, 44px);
+            line-height: 1.4;
+            margin: 0;
+            min-height: 1.4em;
+            font-style: italic;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 1s ease, transform 1s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .line.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hint {
+            position: fixed;
+            bottom: 28px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 14px;
+            opacity: 0.5;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            animation: pulse-hint 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-hint {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+
+        .continue-btn {
+            display: none;
+            margin-top: 40px;
+            padding: 18px 40px;
+            font-size: clamp(18px, 4vw, 22px);
+            font-family: inherit;
+            font-style: italic;
+            border: 2px solid #ff6b9d;
+            background: transparent;
+            color: #ff6b9d;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            opacity: 0;
+            animation: fade-in 1.5s ease forwards;
+            text-decoration: none;
+        }
+
+        @keyframes fade-in {
+            to { opacity: 1; }
+        }
+
+        .continue-btn:hover {
+            background: #ff6b9d;
+            color: white;
+            box-shadow: 0 0 30px rgba(255,107,157,0.6);
+            transform: translateY(-2px);
+        }
+
+        /* Floating background hearts */
+        .bg-heart {
+            position: fixed;
+            font-size: 18px;
+            opacity: 0;
+            pointer-events: none;
+            animation: drift 15s linear infinite;
+        }
+
+        @keyframes drift {
+            0% {
+                opacity: 0;
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+            }
+            10% { opacity: 0.4; }
+            90% { opacity: 0.4; }
+            100% {
+                opacity: 0;
+                transform: translateY(-10vh) translateX(40px) rotate(360deg);
+            }
+        }
+
+        .stars {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle 4s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.8; }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+
+    <div class="stage" id="stage">
+        <p class="line" id="currentLine"></p>
+        <a href="propose.html" class="continue-btn" id="continueBtn">there's one more thing →</a>
+    </div>
+
+    <div class="hint" id="hint">tap anywhere</div>
+
+    <script>
+        const lines = [
+            "hey you...",
+            "do you remember the first time we met?",
+            "i do. i remember everything.",
+            "every laugh, every quiet morning,",
+            "every late-night conversation that turned into sunrise.",
+            "somewhere along the way,",
+            "you became my favorite part of every day.",
+            "and i've been thinking...",
+            "there's something i need to ask you."
+        ];
+
+        let index = 0;
+        const lineEl = document.getElementById('currentLine');
+        const continueBtn = document.getElementById('continueBtn');
+        const hint = document.getElementById('hint');
+
+        function showLine() {
+            if (index >= lines.length) {
+                hint.style.display = 'none';
+                continueBtn.style.display = 'inline-block';
+                document.body.style.cursor = 'default';
+                return;
+            }
+
+            lineEl.classList.remove('visible');
+
+            setTimeout(() => {
+                lineEl.textContent = lines[index];
+                requestAnimationFrame(() => {
+                    lineEl.classList.add('visible');
+                });
+                index++;
+            }, index === 0 ? 0 : 400);
+        }
+
+        function advance(e) {
+            if (e.target.closest('.continue-btn')) return;
+            showLine();
+        }
+
+        document.body.addEventListener('click', advance);
+        document.body.addEventListener('touchstart', (e) => {
+            if (e.target.closest('.continue-btn')) return;
+            e.preventDefault();
+            advance(e);
+        }, { passive: false });
+
+        // Show first line automatically after a beat
+        setTimeout(showLine, 600);
+
+        // Background hearts
+        function spawnHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'bg-heart';
+            heart.textContent = ['💗', '💖', '✨', '🌹'][Math.floor(Math.random() * 4)];
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = (12 + Math.random() * 10) + 's';
+            heart.style.animationDelay = Math.random() * 2 + 's';
+            heart.style.fontSize = (14 + Math.random() * 16) + 'px';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 25000);
+        }
+
+        for (let i = 0; i < 8; i++) {
+            setTimeout(spawnHeart, i * 1500);
+        }
+        setInterval(spawnHeart, 1800);
+
+        // Twinkling stars
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 60; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + 'vw';
+            star.style.top = Math.random() * 100 + 'vh';
+            star.style.animationDelay = Math.random() * 4 + 's';
+            star.style.animationDuration = (3 + Math.random() * 3) + 's';
+            starsContainer.appendChild(star);
+        }
+    </script>
+</body>
+</html>

@@ -451,6 +451,30 @@
             font-weight: 600;
         }
 
+        .cat-details tbody tr,
+        .uncat-table tbody tr {
+            cursor: pointer;
+        }
+
+        .cat-details tbody tr:hover,
+        .uncat-table tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .cat-details tbody tr.disabled,
+        .uncat-table tbody tr.disabled {
+            opacity: 0.45;
+        }
+
+        .cat-details tbody tr.disabled td,
+        .uncat-table tbody tr.disabled td {
+            text-decoration: line-through;
+        }
+
+        .uncat-table tbody tr.disabled td .cat-assign {
+            text-decoration: none;
+        }
+
         .scroll-box {
             max-height: 300px;
             overflow-y: auto;
@@ -770,8 +794,9 @@
                 if (isNaN(date.getTime())) continue;
                 const description = (row[idx['Description']] || '').trim();
                 const type = (row[idx['Type']] || '').trim();
-                records.push({ date, amount, fee, currency, description, type });
+                records.push({ date, amount, fee, currency, description, type, disabled: false });
             }
+            records.forEach((r, i) => { r.id = i; });
             return records;
         }
 
@@ -795,8 +820,10 @@
                 if (EXCLUDED_FROM_SPENDING.has(r.category)) continue;
                 if (!map.has(r.category)) map.set(r.category, { total: 0, count: 0, currency: r.currency, txns: [] });
                 const b = map.get(r.category);
-                b.total += -r.amount;
-                b.count += 1;
+                if (!r.disabled) {
+                    b.total += -r.amount;
+                    b.count += 1;
+                }
                 b.txns.push(r);
             }
             for (const [, b] of map) b.txns.sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount));
@@ -810,8 +837,10 @@
                 if (EXCLUDED_FROM_FLOW.has(r.category)) continue;
                 if (!map.has(r.category)) map.set(r.category, { total: 0, count: 0, currency: r.currency, txns: [] });
                 const b = map.get(r.category);
-                b.total += r.amount;
-                b.count += 1;
+                if (!r.disabled) {
+                    b.total += r.amount;
+                    b.count += 1;
+                }
                 b.txns.push(r);
             }
             for (const [, b] of map) b.txns.sort((a, b) => b.amount - a.amount);
@@ -867,6 +896,7 @@
             const byCurrency = new Map();
             for (const r of records) {
                 if (EXCLUDED_FROM_FLOW.has(r.category)) continue;
+                if (r.disabled) continue;
                 if (!byCurrency.has(r.currency)) {
                     byCurrency.set(r.currency, { inflow: 0, outflow: 0 });
                 }
@@ -970,7 +1000,7 @@
                     .concat(knownCats.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`))
                     .join('');
                 const tableRows = uncatIndices.map(({ r, i }) => `
-                    <tr>
+                    <tr data-id="${r.id}" class="${r.disabled ? 'disabled' : ''}">
                         <td>${formatDate(r.date)}</td>
                         <td>${escapeHtml(r.description)}</td>
                         <td>${escapeHtml(r.type)}</td>
@@ -995,6 +1025,10 @@
                     currentRecords[idx].category = sel.value;
                     renderDashboard();
                 });
+                uncatWidget.addEventListener('click', e => {
+                    if (e.target.closest('.cat-assign')) return;
+                    toggleTxnFromRow(e.target.closest('tbody tr'));
+                });
             }
             widgetsEl.appendChild(uncatWidget);
 
@@ -1015,7 +1049,7 @@
             const rows = breakdown.map(([name, b]) => {
                 const pct = total > 0 ? (b.total / total) * 100 : 0;
                 const txnRows = b.txns.map(t => `
-                    <tr>
+                    <tr data-id="${t.id}" class="${t.disabled ? 'disabled' : ''}">
                         <td class="date">${formatDate(t.date)}</td>
                         <td>${escapeHtml(t.description)}</td>
                         <td class="amt${inMod}">${formatMoney(Math.abs(t.amount), t.currency)}</td>
@@ -1036,6 +1070,11 @@
             }).join('') || `<div class="uncat-empty">${emptyMsg}</div>`;
             widget.innerHTML = `<h2>${escapeHtml(title)}</h2><div class="cat-list">${rows}</div>`;
             widget.addEventListener('click', e => {
+                const tr = e.target.closest('.cat-details tbody tr');
+                if (tr) {
+                    toggleTxnFromRow(tr);
+                    return;
+                }
                 const btn = e.target.closest('.cat-toggle');
                 if (!btn) return;
                 const row = btn.closest('.cat-row');
@@ -1043,6 +1082,27 @@
                 btn.textContent = expanded ? '−' : '+';
             });
             return widget;
+        }
+
+        function toggleTxnFromRow(tr) {
+            if (!tr || tr.dataset.id === undefined) return;
+            const id = parseInt(tr.dataset.id, 10);
+            const rec = currentRecords[id];
+            if (!rec) return;
+            const wasExpanded = new Set();
+            document.querySelectorAll('.cat-row.expanded .cat-name').forEach(el => {
+                wasExpanded.add(el.textContent);
+            });
+            rec.disabled = !rec.disabled;
+            renderDashboard();
+            document.querySelectorAll('.cat-row').forEach(row => {
+                const name = row.querySelector('.cat-name');
+                if (name && wasExpanded.has(name.textContent)) {
+                    row.classList.add('expanded');
+                    const btn = row.querySelector('.cat-toggle');
+                    if (btn) btn.textContent = '−';
+                }
+            });
         }
 
         function escapeHtml(s) {
